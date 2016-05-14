@@ -3,11 +3,13 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.admin import Admin
+from flask.ext.pagedown import PageDown
 
-admin = Admin()
+admin = Admin(base_template='admin_base.html', template_mode='bootstrap3')
 debug_toolbar = DebugToolbarExtension()
 json = FlaskJSON()
 db = SQLAlchemy()
+pagedown = PageDown()
 login_manager = LoginManager()
 app = None
 

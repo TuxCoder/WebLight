@@ -28,11 +28,4 @@ class UserAdminView(SecureModelView):
             model.password = set_pwd
 
 
-class RoleAdminView(SecureModelView):
-
-    form_overrides = {
-        'role_name': StringField
-    }
-
-
 admin_models.append([User, UserAdminView])

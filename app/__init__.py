@@ -3,7 +3,10 @@ from logging.handlers import RotatingFileHandler
 import traceback
 from flask import Flask
 
-from .extensions import db, login_manager, admin_models, admin_views, admin, debug_toolbar
+# Load modules for flask-admin
+from . import auth  # noqa
+
+from .extensions import db, login_manager, admin_models, admin_views, admin, debug_toolbar, pagedown
 
 
 def create_app(config_name='default'):
@@ -41,8 +44,8 @@ def register_extensions(app):
 
     login_manager.init_app(app)
     debug_toolbar.init_app(app)
+    pagedown.init_app(app)
     # migrate.init_app(app, db)
-    # pagedown.init_app(app)
     # babel.init_app(app)
     for model in admin_models:
         admin.add_view(model[1](model[0], db.session))
