@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Profile') }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="large-12 columns">
+    <h3>{{ _('Change password for') }} <em>{{ user.login_name }}</em></h3>
+    <form action="{{ url_for('auth.profile') }}" method="POST">
+      {{ form.hidden_tag() }}
+      <div class="row">
+        <div class="large-12 columns">
+          {{ form.current_password.label }}
+          {{ form.current_password(required=true, placeholder=gettext('Current password')) }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-12 columns">
+          {{ form.new_password.label }}
+          {{ form.new_password(required=true, placeholder=gettext('New password')) }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-12 columns">
+          {{ form.new_password_confirm.label }}
+          {{ form.new_password_confirm(required=true, placeholder=gettext('Confirm new password')) }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="large-12 columns">
+          <input type="submit" class="button expand" value="{{ _('Change password') }}">
+        </div>
+      </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

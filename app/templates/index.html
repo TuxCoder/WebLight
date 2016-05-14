@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}index{% endblock %}
+
+{% block content %}
+    <div class="row">
+    {% for name,device in devices.items() %}
+        <div class="col-md-6">
+            <h2>{{ name }}</h2>
+            <a class="btn btn-default" href="{{ url_for("api.device_on",device=name) }}">On</a>
+            <a class="btn btn-default" href="{{ url_for("api.device_off",device=name) }}">Off</a>
+            <div >
+                <form action="{{ url_for("api.device_animation",device=name) }}">
+                    <h3>Animation</h3>
+                    <div class="form-group">
+                        {{ form.animation.label }}
+                        {{ form.animation(class='form-control') }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.speed.label }}
+                        {{ form.speed(class='form-control') }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.size.label }}
+                        {{ form.size(class='form-control') }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.color.label }}
+                        {{ form.color(class='form-control',type='color') }}
+                    </div>
+                    <button type="submit" class="btn btn-default">set</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+index.Init();
+{% endblock %}
