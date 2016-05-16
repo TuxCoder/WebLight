@@ -11,8 +11,8 @@ class Config:
     from app.leds import Device
 
     DEVICES = {
-        'light': Device(name='light', leds=list(reversed(range(0, 26)))),
-        'printer': Device(name='printer', leds=[26, 27, 30, 31, 28, 29]),
+        'work_place': Device(name='light', leds=list(reversed(range(0, 26)))),
+        'printer': Device(name='printer', leds=[26, 27, 31, 30, 29, 28]),
     }
     LDE_FPS = 60
 
