@@ -38,7 +38,7 @@ class Rainbow(BaseStripAnim):
     def __init__(self, device, start=0, end=-1):
         super(Rainbow, self).__init__(device, start, end)
         self._speed = 1. / 5
-        self._width = 1.
+        self._size = 1.
 
     def step(self, amt=1):
         max = 255
@@ -46,8 +46,8 @@ class Rainbow(BaseStripAnim):
         for i in self._device.get_leds():
             step = float(self._step * self._speed * self._num_leds)
             val = int(
-                ((step % self._num_leds) + pos) *
-                (1. / self._width / self._num_leds) * max %
+                ((step % self._num_leds * self._size) + pos) *
+                (1. / self._size / self._num_leds) * max %
                 max)
             self._led.setHSV(i, (val, max, max))
             pos += 1
@@ -58,8 +58,8 @@ class Rainbow(BaseStripAnim):
     def set_options(self, args=[]):
         if 'speed' in args:
             self._speed = float(args.get('speed'))
-        if 'width' in args:
-            self._width = float(args.get('width'))
+        if 'size' in args:
+            self._size = float(args.get('size'))
 
 
 class NightRider(BaseStripAnim):
