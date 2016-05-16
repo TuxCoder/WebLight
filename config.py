@@ -14,9 +14,10 @@ class Config:
         'light': Device(name='light', leds=list(reversed(range(0, 26)))),
         'printer': Device(name='printer', leds=[26, 27, 30, 31, 28, 29]),
     }
+    LDE_FPS = 60
 
     SECRET_KEY = os.environ.get("SECRET_KEY") or \
-        "asdfasdgasdasdfsdfdsfasd"
+                 "asdfasdgasdasdfsdfdsfasd"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_RECORD_QUERIES = False
@@ -59,13 +60,15 @@ class DevelopmentConfig(Config):
     DEBUG = True
     # SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
-                          'sqlite:///' + os.path.join(basedir, 'app.db')
+                              'sqlite:///' + os.path.join(basedir, 'app.db')
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     DEBUG_TB_PROFILER_ENABLED = True
+    LDE_FPS = 30 #to slow visualizer
 
     @staticmethod
     def init_led():
-        driver = DriverVisualizer(32)
+        # driver = DriverDummy(32)
+        driver = DriverVisualizer(32, port=1618)
         return LEDStrip(driver, threadedUpdate=True)
 
 
@@ -74,7 +77,7 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+                              'sqlite:///' + os.path.join(basedir, 'app.db')
 
     @staticmethod
     def init_led_driver():
@@ -83,7 +86,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+                              'sqlite:///' + os.path.join(basedir, 'app.db')
 
 
 config = {
@@ -93,4 +96,3 @@ config = {
 
     "default": DevelopmentConfig
 }
-

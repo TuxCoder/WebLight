@@ -34,10 +34,14 @@ class Device:
         self.get_led().update()
 
     def set_anim(self, anim: classmethod, fps=25, args=[]):
+
+        if app.config.get('LDE_FPS') is not None:
+            fps = app.config.get('LDE_FPS')
+
         if self._anim is not None:
             self.off()
         self._anim = anim(device=self)
         self._anim.set_options(args=args)
-        self._anim.run(fps=25, threaded=True)
+        self._anim.run(fps=fps, threaded=True)
 
-        app.logger.debug('[Device] \'%s\' [%d] start animation [%s]', self._name, id(self), id(self._anim))
+        app.logger.debug('[Device] \'%s\' [%d] start animation [%s] with %d fps', self._name, id(self), id(self._anim),fps)
