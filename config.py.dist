@@ -1,7 +1,6 @@
 import os
 from bibliopixel.drivers.visualizer import DriverVisualizer
 from bibliopixel.drivers.dummy_driver import DriverDummy
-from bibliopixel.drivers.serial_driver import DriverSerial, LEDTYPE
 from bibliopixel.led import *
 from bibliopixel.drivers.LPD8806 import *
 
@@ -14,7 +13,6 @@ class Config:
     DEVICES = {
         'work_place': Device(name='light', leds=list(reversed(range(0, 26)))),
         'printer': Device(name='printer', leds=[26, 27, 31, 30, 29, 28]),
-        'status': Device(name='status', leds=list(range(0, 18))),
     }
     LDE_FPS = 60
 
@@ -50,13 +48,8 @@ class Config:
 
     @staticmethod
     def init_led():
-        driverA = DriverLPD8806(32, c_order=ChannelOrder.BRG, dev="/dev/spidev0.0")
-        driverB = DriverLPD8806(18, c_order=ChannelOrder.BRG, dev="/dev/spidev0.1")
-
-        return LEDStrip([driverA, driverB], threadedUpdate=True)
-
-    #        driver = DriverLPD8806(32, c_order=ChannelOrder.BRG, use_py_spi="/dev/spidev0.0")
-    #        return LEDStrip(driver, threadedUpdate=True)
+        driver = DriverLPD8806(32, c_order=ChannelOrder.BRG, use_py_spi="/dev/spidev0.0")
+        return LEDStrip(driver, threadedUpdate=True)
 
     @staticmethod
     def init_app(app):
@@ -70,12 +63,12 @@ class DevelopmentConfig(Config):
                               'sqlite:///' + os.path.join(basedir, 'app.db')
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     DEBUG_TB_PROFILER_ENABLED = True
-    LDE_FPS = 30  # to slow visualizer
+    LDE_FPS = 30 #to slow visualizer
 
     @staticmethod
     def init_led():
         # driver = DriverDummy(32)
-        driver = DriverVisualizer(50, port=1618)
+        driver = DriverVisualizer(32, port=1618)
         return LEDStrip(driver, threadedUpdate=True)
 
 
