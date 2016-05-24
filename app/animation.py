@@ -1,4 +1,5 @@
 from bibliopixel.animation import StripChannelTest, BaseStripAnim as OrgBaseStripAnim
+from bibliopixel.animation import colors
 from threading import Thread
 import math
 from .extensions import app
@@ -10,19 +11,23 @@ class BaseStripAnim(OrgBaseStripAnim):
         super(BaseStripAnim, self).__init__(device.get_led(), start, end)
         self._device = device
         self._num_leds = len(self._device.get_leds())
+        self._brightness = 1
 
     def __exit__(self, type, value, traceback):
         self._exit(type, value, traceback)
         self.stopThread(wait=True)
         self._led.waitForUpdate()
 
-    def preRun(self, ant=1):
+    def preRun(self, amt=1):
         app.logger.debug('[BaseStripAnim] run')
+        super(BaseStripAnim, self).preRun(amt)
 
     def get_options(self):
         return []
 
     def set_options(self, args=[]):
+        if 'brightness' in args:
+            self._brightness = float(args.get('brightness'))
         return
 
     def run(self, amt=None, fps=None, sleep=None, max_steps=0, untilComplete=False, max_cycles=0, threaded=False,
@@ -39,12 +44,21 @@ class Rainbow(BaseStripAnim):
         super(Rainbow, self).__init__(device, start, end)
         self._speed = 1. / 5
         self._size = 1.
+        self._cache = []
+
+    def preRun(self, amt=1):
+        fps = 60
+        super(Rainbow, self).preRun(amt)
+        # caching of values requires O(n) ram
+#        for i in range(0, len(self._device.get_led()) * fps):
+#            self._cache[i] = colors.hsv2rgb((x, 1, self._brightness))
 
     def step(self, amt=1):
-        max = 255
+        max = int(255 * self._brightness)
+
+        step = float(self._step * self._speed * self._num_leds)
         pos = 0
         for i in self._device.get_leds():
-            step = float(self._step * self._speed * self._num_leds)
             val = int(
                 ((step % self._num_leds * self._size) + pos) *
                 (1. / self._size / self._num_leds) * max %
@@ -56,6 +70,7 @@ class Rainbow(BaseStripAnim):
         self._step += amt
 
     def set_options(self, args=[]):
+        super(Rainbow, self).set_options(args)
         if 'speed' in args:
             self._speed = float(args.get('speed'))
         if 'size' in args:
@@ -76,7 +91,7 @@ class NightRider(BaseStripAnim):
         ]
 
     def step(self, amt=1):
-        max = 255
+        max = int(255 * self._brightness)
 
         leds = self._device.get_leds()
         for i in leds:
@@ -110,6 +125,7 @@ class NightRider(BaseStripAnim):
         }
 
     def set_options(self, args={}):
+        super(NightRider, self).set_options(args)
         if 'speed' in args:
             self._speed = float(args.get('speed'))
         if 'color' in args:
@@ -127,7 +143,7 @@ class EU(BaseStripAnim):
         self._blue = (0, 0, 255)
 
     def step(self, amt=1):
-        max = 255
+        max = int(255 * self._brightness)
         pos = 0
         for i in self._device.get_leds():
 
@@ -140,6 +156,7 @@ class EU(BaseStripAnim):
         self._step += amt
 
     def set_options(self, args=[]):
+        super(EU, self).set_options(args)
         if 'speed' in args:
             self._speed = float(args.get('speed'))
         if 'size' in args:
@@ -153,22 +170,23 @@ class Stroposcope(BaseStripAnim):
         self._color = (1, 1, 1)
 
     def step(self, amt=1):
-        max = 255
+        max = int(255 * self._brightness)
         pos = 0
         (r, g, b) = self._color
 
         for i in self._device.get_leds():
             if int(self._step * 2. * self._speed % 2) == 0:
-                max = 0
+                val = 0
             else:
-                max = 255
-            self._led.setRGB(i, int(max * r), int(max * g), int(max * b))
+                val = 255
+            self._led.setRGB(i, int(val * r), int(val * g), int(val * b))
             pos += 1
 
         # Increment the internal step by the given amount
         self._step += amt
 
     def set_options(self, args=[]):
+        super(Stroposcope, self).set_options(args)
         if 'speed' in args:
             self._speed = float(args.get('speed'))
         if 'color' in args:
