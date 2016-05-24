@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import SelectField, IntegerField, StringField
+from wtforms import SelectField, IntegerField, StringField, FloatField
 from wtforms.validators import DataRequired, NumberRange
 
 from ..animation import animations
@@ -20,6 +20,10 @@ class AnimationForm(Form):
     color = StringField(
         "Color",
         default="#FFFFFF")
+    brightness = FloatField(
+        "Brightness",
+        default="1",
+        validators=[NumberRange(min=0, max=1)])
 
     def __init__(self, *args, **kwargs):
         """

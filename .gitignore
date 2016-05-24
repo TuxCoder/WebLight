@@ -1,5 +1,6 @@
 /.idea
 /venv
+/config.py
 /app.db
 /logs
 __pycache__
