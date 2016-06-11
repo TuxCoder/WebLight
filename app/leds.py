@@ -1,5 +1,6 @@
 from .extensions import app
 
+
 class Device:
     def __init__(self, name='', leds=[]):
         self._name = name
@@ -26,7 +27,6 @@ class Device:
         if self._anim is not None:
             app.logger.debug('[Device] stop running animation [%d]', id(self._anim))
             self._anim.stopThread(wait=True)
-            app.logger.info('stoped? %d', self._anim.stopped())
             self._anim = None
 
         for i in self._leds:
@@ -44,4 +44,5 @@ class Device:
         self._anim.set_options(args=args)
         self._anim.run(fps=fps, threaded=True)
 
-        app.logger.debug('[Device] \'%s\' [%d] start animation [%s] with %d fps', self._name, id(self), id(self._anim),fps)
+        app.logger.debug('[Device] \'%s\' [%d] start animation [%s] with %d fps', self._name, id(self), id(self._anim),
+                         fps)

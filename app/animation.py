@@ -20,7 +20,8 @@ class BaseStripAnim(OrgBaseStripAnim):
 
     def preRun(self, amt=1):
         app.logger.debug('[BaseStripAnim] run')
-        super(BaseStripAnim, self).preRun(amt)
+        #prefent turning off all lights
+        #super(BaseStripAnim, self).preRun(amt)
 
     def get_options(self):
         return []
