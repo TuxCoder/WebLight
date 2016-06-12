@@ -1,0 +1,13 @@
+<div layout="vertical" layout-fill>
+    <md-content>
+        <h1>{{ vm.device.name }}</h1>
+        <select ng-change="vm.updateAnimation()" ng-model="vm.animation">
+            <option ng-repeat="animation in vm.animations" value="{{ animation.name }}">{{ animation.name }}</option>
+        </select>
+        <lable ng-repeat="(name,param) in vm.device.animation.params">
+            {{ name }}
+            <input ng-model="param.value" type="{{ param.type }}" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}"/>
+        </lable>
+        <button ng-click="vm.update()">update</button>
+    </md-content>
+</div>

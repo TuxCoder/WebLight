@@ -1,0 +1,1 @@
+csrftoken='{{ csrf_token() }}';

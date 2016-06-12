@@ -4,7 +4,6 @@ from flask_json import as_json
 
 from ..animation import animations
 from ..extensions import app
-from ..util import Color
 
 # Define the blueprint: 'auth', set its url prefix: app.url/auth
 mod_rest = Blueprint('api', __name__, url_prefix='/api')
@@ -13,7 +12,7 @@ mod_rest = Blueprint('api', __name__, url_prefix='/api')
 @mod_rest.route('/device', methods=['GET'])
 @as_json
 def device_list():
-    return dict(devices=app.config.get('DEVICES').keys())
+    return dict(devices=list(app.config.get('DEVICES').keys()))
 
 
 @mod_rest.route('/device/<device>/on', methods=['GET'])
@@ -57,5 +56,18 @@ def device_animation(device):
     args = request.args.copy()
 
     device.set_anim(animations[animation], args=args)
+
+    return dict()
+
+@mod_rest.route('/device/<device>/brightness', methods=['GET'])
+@as_json
+def device_brightness(device):
+    devices = app.config.get('DEVICES')
+    if device not in devices:
+        return dict(msg='device not found'), 404
+    device = devices[device]
+
+    brightness = float(request.args.get('brightness'))
+    device.set_brightness(brightness)
 
     return dict()

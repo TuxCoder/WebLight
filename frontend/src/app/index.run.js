@@ -1,4 +1,5 @@
-(function() {
+/* global csrftoken:'' */
+(function () {
   'use strict';
 
   angular
@@ -6,8 +7,8 @@
     .run(runBlock);
 
   /** @ngInject */
-  function runBlock($log) {
-
+  function runBlock($log, $http) {
+    $http.defaults.headers.post['X-CSRFToken'] = csrftoken;
     $log.debug('runBlock end');
   }
 

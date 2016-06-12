@@ -12,6 +12,8 @@ mod_frontend = Blueprint('frontend', __name__, url_prefix='/')
 @mod_frontend.route('/', methods=['GET'])
 @login_required
 def index():
-    form = AnimationForm()
-    devices = app.config.get('DEVICES')
-    return render_template('index.html', devices=devices, form=form)
+    return app.send_static_file('index.html')
+
+@mod_frontend.route('csrf.js', methods=['GET'])
+def csrf():
+    return render_template("csrf.js")

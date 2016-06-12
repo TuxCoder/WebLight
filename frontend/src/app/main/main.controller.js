@@ -1,4 +1,4 @@
-(function() {
+(function () {
   'use strict';
 
   angular
@@ -6,34 +6,27 @@
     .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($timeout, webDevTec, toastr) {
+  function MainController($state,$scope, auth, device) {
     var vm = this;
-
-    vm.awesomeThings = [];
-    vm.classAnimation = '';
-    vm.creationDate = 1465696361254;
-    vm.showToastr = showToastr;
+    vm.gotoDevice = gotoDevice;
+    vm.devices = [];
 
     activate();
 
     function activate() {
-      getWebDevTec();
-      $timeout(function() {
-        vm.classAnimation = 'rubberBand';
-      }, 4000);
-    }
-
-    function showToastr() {
-      toastr.info('Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>');
-      vm.classAnimation = '';
-    }
-
-    function getWebDevTec() {
-      vm.awesomeThings = webDevTec.getTec();
-
-      angular.forEach(vm.awesomeThings, function(awesomeThing) {
-        awesomeThing.rank = Math.random();
+      auth.updateStatus().then(function (status) {
+        if (!status.loggedIn) {
+          $state.go('login');
+        }
+        device.getDevices().then(function (devices) {
+          vm.devices = devices;
+        });
       });
+    }
+
+
+    function gotoDevice(key) {
+        $state.go('device', {key: key});
     }
   }
 })();

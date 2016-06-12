@@ -50,10 +50,13 @@ class Config:
 
     @staticmethod
     def init_led():
-        driverA = DriverLPD8806(32, c_order=ChannelOrder.BRG, dev="/dev/spidev0.0")
-        driverB = DriverLPD8806(18, c_order=ChannelOrder.BRG, dev="/dev/spidev0.1")
+        #driverA = DriverLPD8806(32, c_order=ChannelOrder.BRG, dev="/dev/spidev0.0")
+        #driverB = DriverLPD8806(18, c_order=ChannelOrder.BRG, dev="/dev/spidev0.1")
 
-        return LEDStrip([driverA, driverB], threadedUpdate=True)
+        #return LEDStrip([driverA, driverB], threadedUpdate=True)
+        driver = DriverDummy(50)
+        # driver = DriverVisualizer(50, port=1618)
+        return LEDStrip(driver, threadedUpdate=True)
 
     #        driver = DriverLPD8806(32, c_order=ChannelOrder.BRG, use_py_spi="/dev/spidev0.0")
     #        return LEDStrip(driver, threadedUpdate=True)
@@ -74,8 +77,8 @@ class DevelopmentConfig(Config):
 
     @staticmethod
     def init_led():
-        # driver = DriverDummy(32)
-        driver = DriverVisualizer(50, port=1618)
+        driver = DriverDummy(50)
+        # driver = DriverVisualizer(50, port=1618)
         return LEDStrip(driver, threadedUpdate=True)
 
 

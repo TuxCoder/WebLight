@@ -1,17 +1,54 @@
 from bibliopixel.animation import StripChannelTest, BaseStripAnim as OrgBaseStripAnim
 from bibliopixel.animation import colors
-from threading import Thread
 import math
+from copy import copy
 from .extensions import app
 from .util import Color
+from flask_json import json_response
+
+
+class ParamType(object):
+    type = None
+    value = None
+
+    def __init__(self, value=None):
+        self.value = value
+
+
+class FloatType(ParamType):
+    type = 'float'
+    min = None
+    max = None
+    step = None
+
+    def __init__(self, value=None, min=None, max=None, step=None):
+        super().__init__(value)
+        self.min = min
+        self.max = max
+        self.step = step
+
+
+class RangeType(FloatType):
+    type = 'range'
+
+    def __init__(self, value=None, min=None, max=None, step=None):
+        super().__init__(value, min, max, step)
+
+
+class ColorType(ParamType):
+    type = 'color'
 
 
 class BaseStripAnim(OrgBaseStripAnim):
+    name = None
+    params = {
+        'brightness': RangeType(value=1, min=0, max=1, step=0.01)
+    }
+
     def __init__(self, device, start=0, end=-1):
         super(BaseStripAnim, self).__init__(device.get_led(), start, end)
         self._device = device
         self._num_leds = len(self._device.get_leds())
-        self._brightness = 1
 
     def __exit__(self, type, value, traceback):
         self._exit(type, value, traceback)
@@ -20,15 +57,13 @@ class BaseStripAnim(OrgBaseStripAnim):
 
     def preRun(self, amt=1):
         app.logger.debug('[BaseStripAnim] run')
-        #prefent turning off all lights
-        #super(BaseStripAnim, self).preRun(amt)
+        # prefent turning off all lights
+        # super(BaseStripAnim, self).preRun(amt)
 
     def get_options(self):
         return []
 
     def set_options(self, args=[]):
-        if 'brightness' in args:
-            self._brightness = float(args.get('brightness'))
         return
 
     def run(self, amt=None, fps=None, sleep=None, max_steps=0, untilComplete=False, max_cycles=0, threaded=False,
@@ -41,44 +76,52 @@ class BaseStripAnim(OrgBaseStripAnim):
 
 
 class Rainbow(BaseStripAnim):
+    name = 'rainbow'
+    params = dict(dict(speed=FloatType(), size=FloatType()), **BaseStripAnim.params)
+
     def __init__(self, device, start=0, end=-1):
         super(Rainbow, self).__init__(device, start, end)
-        self._speed = 1. / 5
-        self._size = 1.
         self._cache = []
 
     def preRun(self, amt=1):
-        fps = 60
         super(Rainbow, self).preRun(amt)
+        self._fill_cache(amt)
+
+    def _fill_cache(self, amt=1):
+        fps = 1 / amt
         # caching of values requires O(n) ram
-#        for i in range(0, len(self._device.get_led()) * fps):
-#            self._cache[i] = colors.hsv2rgb((x, 1, self._brightness))
+        steps = len(self._device.get_leds()) * self._size / self.params['speed'].value * fps
+        steps = int(steps + .5)
+        for i in range(0, steps):
+            val = int(i / steps * 255 + .5)  # round hack
+            color = colors.hsv2rgb((val, 1, self.params['brightness'].value))
+            if len(self._cache) < i:
+                self._cache[i] = color
+            else:
+                self._cache.append(color)
 
     def step(self, amt=1):
-        max = int(255 * self._brightness)
 
-        step = float(self._step * self._speed * self._num_leds)
+        fps = 1 / amt
+
+        step = self._step * self._num_leds
         pos = 0
         for i in self._device.get_leds():
-            val = int(
-                ((step % self._num_leds * self._size) + pos) *
-                (1. / self._size / self._num_leds) * max %
-                max)
-            self._led.setHSV(i, (val, max, max))
+            tmp = self._cache[(step + int(pos * fps + .5)) % len(self._cache)]
+            print(tmp)
+            (r, g, b) = tmp
+            self._led.setRGB(i, r, g, b)
             pos += 1
 
         # Increment the internal step by the given amount
         self._step += amt
 
-    def set_options(self, args=[]):
-        super(Rainbow, self).set_options(args)
-        if 'speed' in args:
-            self._speed = float(args.get('speed'))
-        if 'size' in args:
-            self._size = float(args.get('size'))
-
 
 class NightRider(BaseStripAnim):
+    name = 'nightrider'
+    params = dict(dict(speed=FloatType(value=1), size=FloatType(value=1), color=ColorType(value="#FFFFF")),
+                  **BaseStripAnim.params)
+
     def __init__(self, device, start=0, end=-1):
         super(NightRider, self).__init__(device, start, end)
         self._speed = 1.
@@ -92,8 +135,10 @@ class NightRider(BaseStripAnim):
         ]
 
     def step(self, amt=1):
-        max = int(255 * self._brightness)
+        brightness = self.params['brightness'].value
+        max = int(255 * brightness + .5)
 
+        # turn all leds off
         leds = self._device.get_leds()
         for i in leds:
             self._led.setRGB(i, 0, 0, 0)
@@ -119,36 +164,27 @@ class NightRider(BaseStripAnim):
         # Increment the internal step by the given amount
         self._step += amt
 
-    def get_options(self):
-        return {
-            'speed': self._speed,
-            'color': '#' + Color.rgb2hex(self._color)
-        }
-
-    def set_options(self, args={}):
-        super(NightRider, self).set_options(args)
-        if 'speed' in args:
-            self._speed = float(args.get('speed'))
-        if 'color' in args:
-            color = args.get('color')
-            (r, g, b) = Color.hex2rgb(color[1:])
-            self._color = (r / 255., g / 255., b / 255.)
-
 
 class EU(BaseStripAnim):
+    name = 'eu'
+    params = dict(dict(speed=FloatType(value=1), size=FloatType(value=1)),
+                  **BaseStripAnim.params)
+
     def __init__(self, device, start=0, end=-1):
         super(EU, self).__init__(device, start, end)
-        self._speed = 1.
-        self._width = 1.
         self._yellow = (255, 255, 0)
         self._blue = (0, 0, 255)
 
     def step(self, amt=1):
-        max = int(255 * self._brightness)
+        brightness = self.params['brightness'].value
+        speed = self.params['speed'].value
+        size = self.params['size'].value
+        max = int(255 * brightness + .5)
+
         pos = 0
         for i in self._device.get_leds():
 
-            if math.floor((self._step * self._speed * self._width + i) / self._width) % 2 == 0:
+            if math.floor((self._step * speed * size + i) / size) % 2 == 0:
                 self._led.setRGB(i, 255, 255, 0)
             else:
                 self._led.setRGB(i, 0, 0, 255)
@@ -156,32 +192,28 @@ class EU(BaseStripAnim):
         # Increment the internal step by the given amount
         self._step += amt
 
-    def set_options(self, args=[]):
-        super(EU, self).set_options(args)
-        if 'speed' in args:
-            self._speed = float(args.get('speed'))
-        if 'size' in args:
-            self._width = float(args.get('size'))
-
 
 class Stroposcope(BaseStripAnim):
+    name = 'stroposcope'
+    params = dict(dict(speed=FloatType(value=1), color=ColorType(value=1)),
+                  **BaseStripAnim.params)
+
     def __init__(self, device, start=0, end=-1):
         super(Stroposcope, self).__init__(device, start, end)
-        self._speed = 1. / 5
-        self._color = (1, 1, 1)
 
     def step(self, amt=1):
-        max = int(255 * self._brightness)
-        pos = 0
-        (r, g, b) = self._color
+        brightness = self.params['brightness'].value
+        speed = self.params['speed'].value
+        color = self.params['color'].value
+        (r, g, b) = colors.hex2rgb(color)
+
+        if int(self._step * 2. * speed % 2) == 0:
+            brightness = 0
+
+        (r, g, b) = (int(brightness * r + .5), int(brightness * g + .5), int(brightness * b + .5))
 
         for i in self._device.get_leds():
-            if int(self._step * 2. * self._speed % 2) == 0:
-                val = 0
-            else:
-                val = 255
-            self._led.setRGB(i, int(val * r), int(val * g), int(val * b))
-            pos += 1
+            self._led.setRGB(i, r, g, b)
 
         # Increment the internal step by the given amount
         self._step += amt
@@ -195,6 +227,13 @@ class Stroposcope(BaseStripAnim):
             (r, g, b) = Color.hex2rgb(color[1:])
             self._color = (r / 255., g / 255., b / 255.)
 
+
+animation_params = {
+    'text': ParamType,
+    'float': FloatType,
+    'range': RangeType,
+    'color': ColorType
+}
 
 animations = {
     'rainbow': Rainbow,

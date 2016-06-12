@@ -12,7 +12,19 @@
         url: '/',
         templateUrl: 'app/main/main.html',
         controller: 'MainController',
-        controllerAs: 'main'
+        controllerAs: 'vm'
+      })
+      .state('login', {
+        url: "/login",
+        templateUrl: "app/login/login.html",
+        controller: 'LoginController',
+        controllerAs: 'vm'
+      })
+      .state('device', {
+        url: "/device/:key",
+        templateUrl: "app/device/device.html",
+        controller: 'DeviceController',
+        controllerAs: 'vm'
       });
 
     $urlRouterProvider.otherwise('/');
