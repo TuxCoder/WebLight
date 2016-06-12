@@ -3,4 +3,6 @@
 /config.py
 /app.db
 /logs
+/app/static
+!/app/static/.gitkeep
 __pycache__
