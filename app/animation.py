@@ -162,8 +162,8 @@ class NightRider(BaseStripAnim):
 
     def _params_updated(self):
         brightness = self._params['brightness'].get_value()
-        self._speed = self.params['speed'].get_value()
-        color = self.params['color'].get_value()
+        self._speed = self._params['speed'].get_value()
+        color = self._params['color'].get_value()
         (r, g, b) = colors.hex2rgb(color)
         self._color = (r * brightness, g * brightness, b * brightness)
 
@@ -205,9 +205,9 @@ class EU(BaseStripAnim):
         super(EU, self).__init__(device, start, end)
 
     def _params_updated(self):
-        brightness = self.params['brightness'].get_value()
-        self._speed = self.params['speed'].get_value()
-        self._size = self.params['size'].get_value()
+        brightness = self._params['brightness'].get_value()
+        self._speed = self._params['speed'].get_value()
+        self._size = self._params['size'].get_value()
         self._max = int(255 * brightness + .5)
 
     def step(self, amt=1):
@@ -233,9 +233,9 @@ class Stroposcope(BaseStripAnim):
         super(Stroposcope, self).__init__(device, start, end)
 
     def _params_updated(self):
-        brightness = self.params['brightness'].get_value()
-        self._speed = self.params['speed'].get_value()
-        color = self.params['color'].get_value()
+        brightness = self._params['brightness'].get_value()
+        self._speed = self._params['speed'].get_value()
+        color = self._params['color'].get_value()
         (r, g, b) = colors.hex2rgb(color)
         self._color = (int(brightness * r + .5), int(brightness * g + .5), int(brightness * b + .5))
 
@@ -262,8 +262,8 @@ class ON(BaseStripAnim):
         super(ON, self).__init__(device, start, end)
 
     def _params_updated(self):
-        brightness = self.params['brightness'].get_value()
-        color = self.params['color'].get_value()
+        brightness = self._params['brightness'].get_value()
+        color = self._params['color'].get_value()
         (r, g, b) = colors.hex2rgb(color)
         self._color = (int(brightness * r + .5), int(brightness * g + .5), int(brightness * b + .5))
 
