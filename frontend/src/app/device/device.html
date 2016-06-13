@@ -17,7 +17,15 @@
             </div>
         </lable>
     </md-input-container>
-    <md-input-container  layout="row" flex="20">
-        <input type="submit" value="update"/>
-    </md-input-container>
+    <div layout="row" >
+        <md-input-container flex="20">
+            <input type="submit" value="update"/>
+        </md-input-container>
+        <md-input-container  layout="row" flex="20">
+            <input ng-click="vm.off()" type="button" value="off"/>
+        </md-input-container>
+        <md-input-container  layout="row" flex="20">
+            <input ng-click="vm.reload()" type="button" value="reload"/>
+        </md-input-container>
+    </div>
 </form>

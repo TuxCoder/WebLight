@@ -77,6 +77,10 @@ class Device(Resource):
     def post(self, device_id):
         args = device_parser.parse_args()
         device = app.config.get('DEVICES')[device_id]
+        if args['animation'] == None:
+            device.off()
+            return device
+
         animation = animations[args['animation']['name']]
         if device.get_anim() is None or device.get_anim().name != animation.name:
             device.set_anim(animation)

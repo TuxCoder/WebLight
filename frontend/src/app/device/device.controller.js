@@ -12,18 +12,33 @@
     vm.animations = undefined;
     vm.animation = undefined;
     vm.update = update;
+    vm.reload = reload;
+    vm.off = off;
     vm.updateAnimation = updateAnimation;
 
     activate();
 
     function activate() {
+      vm.reload();
+      animations.getAnimations().then(function (animations) {
+        vm.animations = animations;
+      });
+    }
+
+    function reload() {
       device.getDevice($stateParams.key).then(function (device) {
         vm.device = device;
           vm.animation = device.animation.name;
       });
-      animations.getAnimations().then(function (animations) {
-        vm.animations = animations;
-      });
+    }
+
+    function off() {
+      if (vm.device != undefined) {
+        device.offDevice(vm.device).then(function (device) {
+          vm.device = device;
+          vm.animation = null;
+        });
+      }
     }
 
     var update_id =0; // prevent from update to old data

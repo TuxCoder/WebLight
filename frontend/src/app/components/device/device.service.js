@@ -11,6 +11,7 @@
     vm.getDevices = getDevices;
     vm.getDevice = getDevice;
     vm.updateDevice = updateDevice;
+    vm.offDevice = offDevice;
 
 
     function getDevices() {
@@ -26,6 +27,13 @@
     }
 
     function updateDevice(device) {
+      return $http.post('/api/device/' + device.name, device).then(function(resp){
+        return resp.data;
+      });
+    }
+
+    function offDevice(device) {
+      device.animation = null;
       return $http.post('/api/device/' + device.name, device).then(function(resp){
         return resp.data;
       });
