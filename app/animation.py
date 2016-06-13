@@ -1,7 +1,7 @@
 from bibliopixel.animation import StripChannelTest, BaseStripAnim as OrgBaseStripAnim
 from bibliopixel.animation import colors
 import math
-from copy import copy
+from copy import copy, deepcopy
 from .extensions import app
 from .util import Color
 from flask_json import json_response
@@ -58,7 +58,7 @@ class BaseStripAnim(OrgBaseStripAnim):
         super(BaseStripAnim, self).__init__(device.get_led(), start, end)
         self._device = device
         self._num_leds = len(self._device.get_leds())
-        self._params = self.params
+        self._params = deepcopy(self.params)
         self._amt = 1
 
     def __exit__(self, type, value, traceback):

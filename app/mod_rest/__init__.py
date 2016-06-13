@@ -31,10 +31,26 @@ class ParamItems(fields.Raw):
             out[k]['type'] = v.type
         return out
 
+    def __init__(self, alt_attribute=None, **kwargs):
+        super(ParamItems, self).__init__(**kwargs)
+        self.alt_attribute = alt_attribute
+
+    def output(self, key, obj):
+
+        value = fields.get_value(key if self.attribute is None else self.attribute, obj)
+
+        if value is None and self.alt_attribute is not None:
+            value = fields.get_value(self.alt_attribute, obj)
+
+        if value is None:
+            return self.default
+
+        return self.format(value)
+
 
 animations_fiels = {
     'name': fields.String,
-    'params': ParamItems
+    'params': ParamItems(attribute='_params', alt_attribute='params')
 }
 
 
@@ -83,10 +99,12 @@ class Device(Resource):
 
         animation = animations[args['animation']['name']]
         if device.get_anim() is None or device.get_anim().name != animation.name:
-            device.set_anim(animation)
+            # animation changed
+            device.set_anim(animation, params=args['animation']['params'])
+            return device
 
-        for name, param in args['animation']['params'].items():
-            device.get_anim().params[name].value = param.value
+        device.get_anim().set_params(args['animation']['params'])
+
         return device
 
 
