@@ -1,0 +1,8 @@
+
+<md-sidenav md-is-locked-open="vm.isOpen" class="md-whiteframe-z2">
+    <md-list>
+        <md-list-item ng-repeat="device in vm.devices">
+            <md-button ng-click="vm.gotoDevice(device.name)">{{device.name}}</md-button>
+        </md-list-item>
+    </md-list>
+</md-sidenav>

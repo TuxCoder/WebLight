@@ -86,7 +86,7 @@ class BaseStripAnim(OrgBaseStripAnim):
 
 class Rainbow(BaseStripAnim):
     name = 'rainbow'
-    params = dict(dict(speed=FloatType(), size=FloatType()), **BaseStripAnim.params)
+    params = dict(dict(speed=FloatType(1), size=FloatType(1)), **BaseStripAnim.params)
 
     def __init__(self, device, start=0, end=-1):
         super(Rainbow, self).__init__(device, start, end)
@@ -184,8 +184,6 @@ class EU(BaseStripAnim):
 
     def __init__(self, device, start=0, end=-1):
         super(EU, self).__init__(device, start, end)
-        self._yellow = (255, 255, 0)
-        self._blue = (0, 0, 255)
 
     def step(self, amt=1):
         brightness = self.params['brightness'].get_value()
@@ -197,9 +195,9 @@ class EU(BaseStripAnim):
         for i in self._device.get_leds():
 
             if math.floor((self._step * speed * size + i) / size) % 2 == 0:
-                self._led.setRGB(i, 255, 255, 0)
+                self._led.setRGB(i, max, max, 0) #yellow
             else:
-                self._led.setRGB(i, 0, 0, 255)
+                self._led.setRGB(i, 0, 0, max) #blue
             pos += 1
         # Increment the internal step by the given amount
         self._step += amt

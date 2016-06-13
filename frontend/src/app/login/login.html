@@ -1,18 +1,13 @@
-<div layout="vertical" layout-fill>
 
-    <md-content>
-        {{ vm.error }}
-        <form ng-submit="vm.login()" name="auth">
-            <label>
-                Username:
-                <input type="text" ng-model="vm.form.login_name" name="login_name" required/>
-            </label>
-            <label>
-                Password:
-                <input type="password" ng-model="vm.form.password" name="password" required/>
-            </label>
-            <input type="submit" value="Login" />
-        </form>
-    </md-content>
-
-</div>
+{{ vm.error }}
+<form ng-submit="vm.login()" name="auth">
+    <label>
+        Username:
+        <input type="text" ng-model="vm.form.login_name" name="login_name" required/>
+    </label>
+    <label>
+        Password:
+        <input type="password" ng-model="vm.form.password" name="password" required/>
+    </label>
+    <input type="submit" value="Login" />
+</form>

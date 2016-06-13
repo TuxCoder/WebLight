@@ -1,15 +1,23 @@
-<div layout="vertical" layout-fill>
-    <md-content>
-        <h1>{{ vm.device.name }}</h1>
-        <form ng-submit="vm.update()">
-            <select ng-change="vm.updateAnimation()" ng-model="vm.animation">
-                <option ng-repeat="animation in vm.animations" value="{{ animation.name }}">{{ animation.name }}</option>
-            </select>
-            <lable ng-repeat="(name,param) in vm.device.animation.params">
-                {{ name }}
-                <input ng-change="vm.update()" ng-model="param.value" type="{{ param.type }}" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}"/>
-            </lable>
-            <button type="submit">update</button>
-        </form>
-    </md-content>
-</div>
+
+<h1>{{ vm.device.name }}</h1>
+<form ng-submit="vm.update()">
+    <md-input-container layout="row">
+        <md-select ng-change="vm.updateAnimation()" ng-model="vm.animation">
+            <md-option ng-value="animation.name" ng-repeat="animation in vm.animations">{{ animation.name }}</md-option>
+        </md-select>
+      </md-input-container>
+      <md-input-container layout="row" ng-repeat="(name,param) in vm.device.animation.params">
+        <lable  flex="60">
+            {{ name }}
+            <div ng-switch="param.type">
+                <input ng-switch-when="float" ng-change="vm.update()" ng-model="param.value" type="number" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}"/>
+                <input ng-switch-when="color" ng-change="vm.update()" ng-model="param.value" type="color"/>
+                <md-slider ng-switch-when="range" ng-model="param.value" ng-change="vm.update()" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}' ></md-slider>
+                <input ng-switch-default="" ng-change="vm.update()" ng-model="param.value" type="text"/>
+            </div>
+        </lable>
+    </md-input-container>
+    <md-input-container  layout="row" flex="20">
+        <input type="submit" value="update"/>
+    </md-input-container>
+</form>

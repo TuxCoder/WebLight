@@ -6,27 +6,14 @@
     .controller('MainController', MainController);
 
   /** @ngInject */
-  function MainController($state,$scope, auth, device) {
+  function MainController($rootScope,$scope, auth, device) {
     var vm = this;
-    vm.gotoDevice = gotoDevice;
-    vm.devices = [];
 
     activate();
-
-    function activate() {
-      auth.updateStatus().then(function (status) {
-        if (!status.loggedIn) {
-          $state.go('login');
-        }
-        device.getDevices().then(function (devices) {
-          vm.devices = devices;
-        });
-      });
-    }
-
-
-    function gotoDevice(key) {
-        $state.go('device', {key: key});
+    function activate(){
+      if($rootScope.sidenav != undefined){
+        $rootScope.sidenav.open();
+      }
     }
   }
 })();

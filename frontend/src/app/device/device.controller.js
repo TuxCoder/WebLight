@@ -26,11 +26,16 @@
       });
     }
 
+    var update_id =0; // prevent from update to old data
     function update() {
+      update_id++;
+      var current_id =update_id;
       if (vm.device != undefined) {
         device.updateDevice(vm.device).then(function (device) {
-          vm.device = device;
-          vm.animation = device.animation.name;
+          if(update_id==current_id) {
+            vm.device = device;
+            vm.animation = device.animation.name;
+          }
         });
       }
     }
@@ -39,6 +44,7 @@
       if (vm.device != undefined) {
         animations.getAnimation(vm.animation).then(function(animation){
           vm.device.animation = animation;
+          vm.update();
         });
       }
     }
