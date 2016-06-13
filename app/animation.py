@@ -14,6 +14,9 @@ class ParamType(object):
     def __init__(self, value=None):
         self.value = value
 
+    def get_value(self):
+        return self.value
+
 
 class FloatType(ParamType):
     type = 'float'
@@ -26,6 +29,12 @@ class FloatType(ParamType):
         self.min = min
         self.max = max
         self.step = step
+
+    def get_value(self):
+        try:
+            return float(self.value)
+        except (TypeError, ValueError):
+            return 1
 
 
 class RangeType(FloatType):
@@ -89,12 +98,16 @@ class Rainbow(BaseStripAnim):
 
     def _fill_cache(self, amt=1):
         fps = 1 / amt
+        speed = self.params['speed'].get_value()
+        size = self.params['size'].get_value()
+        brightness = self.params['brightness'].get_value()
+
         # caching of values requires O(n) ram
-        steps = len(self._device.get_leds()) * self._size / self.params['speed'].value * fps
+        steps = len(self._device.get_leds()) * size / speed * fps
         steps = int(steps + .5)
         for i in range(0, steps):
             val = int(i / steps * 255 + .5)  # round hack
-            color = colors.hsv2rgb((val, 1, self.params['brightness'].value))
+            color = colors.hsv2rgb((val, 255, int(255*brightness)))
             if len(self._cache) < i:
                 self._cache[i] = color
             else:
@@ -107,8 +120,7 @@ class Rainbow(BaseStripAnim):
         step = self._step * self._num_leds
         pos = 0
         for i in self._device.get_leds():
-            tmp = self._cache[(step + int(pos * fps + .5)) % len(self._cache)]
-            print(tmp)
+            tmp = self._cache[int(step + int(pos * fps + .5)) % len(self._cache)]
             (r, g, b) = tmp
             self._led.setRGB(i, r, g, b)
             pos += 1
@@ -119,7 +131,7 @@ class Rainbow(BaseStripAnim):
 
 class NightRider(BaseStripAnim):
     name = 'nightrider'
-    params = dict(dict(speed=FloatType(value=1), size=FloatType(value=1), color=ColorType(value="#FFFFF")),
+    params = dict(dict(speed=FloatType(value=1), size=FloatType(value=1), color=ColorType(value="#FFFFFF")),
                   **BaseStripAnim.params)
 
     def __init__(self, device, start=0, end=-1):
@@ -135,7 +147,7 @@ class NightRider(BaseStripAnim):
         ]
 
     def step(self, amt=1):
-        brightness = self.params['brightness'].value
+        brightness = self.params['brightness'].get_value()
         max = int(255 * brightness + .5)
 
         # turn all leds off
@@ -176,9 +188,9 @@ class EU(BaseStripAnim):
         self._blue = (0, 0, 255)
 
     def step(self, amt=1):
-        brightness = self.params['brightness'].value
-        speed = self.params['speed'].value
-        size = self.params['size'].value
+        brightness = self.params['brightness'].get_value()
+        speed = self.params['speed'].get_value()
+        size = self.params['size'].get_value()
         max = int(255 * brightness + .5)
 
         pos = 0
@@ -195,16 +207,16 @@ class EU(BaseStripAnim):
 
 class Stroposcope(BaseStripAnim):
     name = 'stroposcope'
-    params = dict(dict(speed=FloatType(value=1), color=ColorType(value=1)),
+    params = dict(dict(speed=FloatType(value=1), color=ColorType(value="#FFFFFF")),
                   **BaseStripAnim.params)
 
     def __init__(self, device, start=0, end=-1):
         super(Stroposcope, self).__init__(device, start, end)
 
     def step(self, amt=1):
-        brightness = self.params['brightness'].value
-        speed = self.params['speed'].value
-        color = self.params['color'].value
+        brightness = self.params['brightness'].get_value()
+        speed = self.params['speed'].get_value()
+        color = self.params['color'].get_value()
         (r, g, b) = colors.hex2rgb(color)
 
         if int(self._step * 2. * speed % 2) == 0:
@@ -217,15 +229,6 @@ class Stroposcope(BaseStripAnim):
 
         # Increment the internal step by the given amount
         self._step += amt
-
-    def set_options(self, args=[]):
-        super(Stroposcope, self).set_options(args)
-        if 'speed' in args:
-            self._speed = float(args.get('speed'))
-        if 'color' in args:
-            color = args.get('color')
-            (r, g, b) = Color.hex2rgb(color[1:])
-            self._color = (r / 255., g / 255., b / 255.)
 
 
 animation_params = {
