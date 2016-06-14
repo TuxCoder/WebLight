@@ -103,43 +103,45 @@ class Rainbow(BaseStripAnim):
 
     def preRun(self, amt=1):
         super(Rainbow, self).preRun(amt)
-        self._fill_cache(amt)
+        self._fill_cache(self._amt)
 
     def _fill_cache(self, amt):
         fps = 1 / amt
-        speed = self._params['speed'].get_value()
-        size = self._params['size'].get_value()
-        brightness = self._params['brightness'].get_value()
 
         # caching of values requires O(n) ram
-        steps = len(self._device.get_leds()) * size / speed * fps
+        new_cache = {}
+        steps = len(self._device.get_leds()) * fps * self._size
         steps = int(steps + .5)
         for i in range(0, steps):
-            val = int(i / steps * 255 + .5)  # round hack
-            color = colors.hsv2rgb((val, 255, int(255 * brightness)))
-            if len(self._cache) < i:
-                self._cache[i] = color
-            else:
-                self._cache.append(color)
+            val = int(i / steps * 255 + .5)
+            color = colors.hsv2rgb((val, 255, int(255 * self._brightness)))
+            new_cache[i] = color
+
+        self._cache = new_cache
 
     def _params_updated(self):
         super()._params_updated()
+
+        self._speed = self._params['speed'].get_value()
+        self._size = self._params['size'].get_value()
+        self._brightness = self._params['brightness'].get_value()
+
         self._fill_cache(self._amt)
 
     def step(self, amt=1):
 
         fps = 1 / amt
+        cache = self._cache
 
         step = self._step * self._num_leds
         pos = 0
         for i in self._device.get_leds():
-            tmp = self._cache[int(step + int(pos * fps + .5)) % len(self._cache)]
-            (r, g, b) = tmp
+            (r, g, b) = cache[int(step + int(pos * fps + .5)) % len(cache)]
             self._led.setRGB(i, r, g, b)
             pos += 1
 
         # Increment the internal step by the given amount
-        self._step += amt
+        self._step += amt * self._speed
 
 
 class NightRider(BaseStripAnim):
@@ -175,7 +177,7 @@ class NightRider(BaseStripAnim):
             self._led.setRGB(i, 0, 0, 0)
 
         for a in self._animations:
-            x = self._step * self._speed
+            x = self._step
             pos = float(a['f'](x) * (self._num_leds - 1))
             (r, g, b) = a['rgb'](x)
             (_r, _g, _b) = self._color
@@ -186,14 +188,11 @@ class NightRider(BaseStripAnim):
             value = pos % 1
             valueN = 1 - value
 
-            value *= max
-            valueN *= max
-
             self._led.setRGB(leds[int(first)], int(r * valueN), int(g * valueN), int(b * valueN))
             self._led.setRGB(leds[int(second)], int(r * value), int(g * value), int(b * value))
 
         # Increment the internal step by the given amount
-        self._step += amt
+        self._step += amt * self._speed
 
 
 class EU(BaseStripAnim):
@@ -215,13 +214,13 @@ class EU(BaseStripAnim):
         pos = 0
         for i in self._device.get_leds():
 
-            if math.floor((self._step * self._speed * self._size + i) / self._size) % 2 == 0:
+            if math.floor((self._step * self._size + i) / self._size) % 2 == 0:
                 self._led.setRGB(i, self._max, self._max, 0)  # yellow
             else:
                 self._led.setRGB(i, 0, 0, self._max)  # blue
             pos += 1
         # Increment the internal step by the given amount
-        self._step += amt
+        self._step += amt * self._speed
 
 
 class Stroposcope(BaseStripAnim):
@@ -241,7 +240,7 @@ class Stroposcope(BaseStripAnim):
 
     def step(self, amt=1):
 
-        if int(self._step * 2. * self._speed % 2) == 0:
+        if int(self._step * 2. % 2) == 0:
             (r, g, b) = self._color
         else:
             (r, g, b) = (0, 0, 0)
@@ -250,7 +249,7 @@ class Stroposcope(BaseStripAnim):
             self._led.setRGB(i, r, g, b)
 
         # Increment the internal step by the given amount
-        self._step += amt
+        self._step += amt * self._speed
 
 
 class ON(BaseStripAnim):

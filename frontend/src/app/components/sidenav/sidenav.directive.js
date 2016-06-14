@@ -18,20 +18,25 @@
     return directive;
 
     /** @ngInject */
-    function SidenavController($state, device, $rootScope) {
+    function SidenavController($state, device,auth, $rootScope) {
       var vm = this;
       vm.gotoDevice = gotoDevice;
       vm.devices = [];
       vm.isOpen = true;
       vm.open = open;
+      vm.update = update;
       $rootScope.sidenav = vm;
 
-      activate();
+      update();
 
-      function activate() {
-        device.getDevices().then(function (devices) {
-          vm.devices = devices;
-        });
+      function update() {
+        if(auth.status.loggedIn) {
+          device.getDevices().then(function (devices) {
+            vm.devices = devices;
+          });
+        }else {
+          vm.devices=[];
+        }
       }
 
 

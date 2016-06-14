@@ -5,8 +5,8 @@
     </section>
 
     <div ng-switch="vm.status.loggedIn">
-        <div ng-switch-when="true">Hello {{ vm.status.user.login_name }}</div>
-        <div ng-switch-default>login</div>
+        <div ng-switch-when="true">Hello {{ vm.status.user.login_name }} <md-button ng-click="vm.logout()">Logout</md-button></div>
+        <div ng-switch-default><md-button ng-click="vm.login()">login</md-button></div>
     </div>
 
 </md-toolbar>

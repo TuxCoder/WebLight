@@ -21,9 +21,15 @@
     return directive;
 
     /** @ngInject */
-    function NavbarController(auth) {
+    function NavbarController(auth,$state) {
       var vm = this;
       vm.status= auth.getStatus();
+      vm.logout = auth.logout;
+      vm.login = login;
+
+      function login(){
+        $state.go('login')
+      }
     }
   }
 
