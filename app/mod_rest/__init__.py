@@ -1,5 +1,3 @@
-from ..extensions import api
-
 from flask_restful import Resource, fields, marshal_with, reqparse
 from flask.ext.login import current_user
 from flask.json import JSONEncoder
