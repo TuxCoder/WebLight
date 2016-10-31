@@ -1,6 +1,9 @@
-from threading import Thread
 import socket
+import math
 from struct import *
+from threading import Thread
+from bibliopixel.animation import colors
+from . import BaseStripAnim, RangeType, FloatType
 
 
 class AudioVisulizer(BaseStripAnim):
@@ -115,4 +118,3 @@ class AudioVisulizer(BaseStripAnim):
         self._start = self._params['start'].get_value()
         self._end = self._params['end'].get_value()
         self._min_value = self._params['min_value'].get_value()
-
