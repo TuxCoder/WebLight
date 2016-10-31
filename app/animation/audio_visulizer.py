@@ -22,7 +22,7 @@ class AudioVisulizer(BaseStripAnim):
     def __init__(self, device, start=0, end=-1):
         super(AudioVisulizer, self).__init__(device, start, end)
 
-        self.udp_data = [-100.0] * self.num_data
+        self.udp_data = self._prepare_data([-100.0] * self.num_data)
 
         self._stoped = False
         self._udp_server = Thread(target=self.udp_server)
