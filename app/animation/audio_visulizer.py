@@ -3,7 +3,7 @@ import math
 from struct import *
 from threading import Thread
 from bibliopixel.animation import colors
-from . import BaseStripAnim, RangeType, FloatType
+from . import BaseStripAnim, RangeType, FloatType,BooleanType
 
 
 class AudioVisulizer(BaseStripAnim):
@@ -14,10 +14,13 @@ class AudioVisulizer(BaseStripAnim):
         offset=FloatType(60),
         start=RangeType(value=.01, min=0, max=1, step=0.01),
         end=RangeType(value=.7, min=0, max=1, step=0.01),
-        min_value=RangeType(value=.05, min=0, max=1, step=0.01)),
-        **BaseStripAnim.params)
+        min_value=RangeType(value=.05, min=0, max=1, step=0.01),
+        log=RangeType(value=False),
+        color_offset=RangeType(value=0, min=0, max=1, step=0.01),
+        high_pass=RangeType(value=20, step=1)),
+    **BaseStripAnim.params)
 
-    num_data = 512
+    num_data = 2048
 
     def __init__(self, device, start=0, end=-1):
         super(AudioVisulizer, self).__init__(device, start, end)
@@ -80,8 +83,13 @@ class AudioVisulizer(BaseStripAnim):
         w = src_num / self._num_leds
         out = [0] * self._num_leds
         for i in range(self._num_leds):
-            src_from = i * w + src_start
-            src_to = (i + 1) * w + src_start
+            if self._log:
+                src_from = (pow(10, i / self.num * x) - 1) / (math.pow(10, x) - 1) * src_num + src_start
+                src_to = (pow(10, (i + 1) / self.num * x) - 1) / (math.pow(10, x) - 1) * src_num + src_start
+            else:
+                src_from = i * w + src_start
+                src_to = (i + 1) * w + src_start
+
             pre_s = int(src_from)
             s = math.ceil(src_from)
             e = math.floor(src_to)
@@ -104,7 +112,7 @@ class AudioVisulizer(BaseStripAnim):
         for i, led in enumerate(self._device.get_leds()):
             v = data[i]
             v = int(v * 255 * self._brightness)
-            h = int(255 * (i / self._num_leds + .3)) % 255
+            h = int(255 * (i / self._num_leds + self._color_offset)) % 255
             (r, g, b) = colors.hsv2rgb((h, s, v))
 
             self._led.setRGB(led, r, g, b)
@@ -118,3 +126,6 @@ class AudioVisulizer(BaseStripAnim):
         self._start = self._params['start'].get_value()
         self._end = self._params['end'].get_value()
         self._min_value = self._params['min_value'].get_value()
+        self._min_value = self._params['high_pass'].get_value()
+        self._log = self._params['log'].get_value()
+        self._color_offset = self._params['color_offset'].get_value()

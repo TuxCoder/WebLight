@@ -44,6 +44,10 @@ class ColorType(ParamType):
     type = 'color'
 
 
+class BooleanType(ParamType):
+    type = 'boolean'
+
+
 class BaseStripAnim(OrgBaseStripAnim):
     name = None
     params = {
@@ -103,7 +107,8 @@ animation_params = {
     'text': ParamType,
     'float': FloatType,
     'range': RangeType,
-    'color': ColorType
+    'color': ColorType,
+    'boolean': BooleanType
 }
 
 animations = {
