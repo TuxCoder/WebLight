@@ -12,6 +12,7 @@
             <div ng-switch="param.type">
                 <input ng-switch-when="float" ng-change="vm.update()" ng-model="param.value" type="number" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}"/>
                 <input ng-switch-when="color" ng-change="vm.update()" ng-model="param.value" type="color"/>
+                <input ng-switch-when="boolean" ng-change="vm.update()" ng-model="param.value" type="checkbox"/>
                 <md-slider ng-switch-when="range" ng-model="param.value" ng-change="vm.update()" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}' ></md-slider>
                 <input ng-switch-default="" ng-change="vm.update()" ng-model="param.value" type="text"/>
             </div>

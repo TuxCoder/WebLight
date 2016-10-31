@@ -6,7 +6,7 @@
     .service('auth', auth);
 
   /** @ngInject */
-  function auth($http,$rootScope) {
+  function auth($http,$rootScope,$state) {
     var vm = this;
     vm.getForm = getForm;
     vm.login = login;
@@ -31,7 +31,8 @@
 
     function logout() {
       return $http.post('/api/logout').then(function () {
-        vm.updateStatus()
+        vm.updateStatus();
+        $state.go('home');
       });
     }
 
