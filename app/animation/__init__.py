@@ -28,7 +28,12 @@ class FloatType(ParamType):
 
     def get_value(self):
         try:
-            return float(self.value)
+            self.value = float(self.value)
+            if self.min is not None:
+                self.value = max(self.value, self.min)
+            if self.max is not None:
+                self.value = min(self.value, self.max)
+            return self.value
         except (TypeError, ValueError):
             return 1
 
