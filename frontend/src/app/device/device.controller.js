@@ -49,7 +49,9 @@
         device.updateDevice(vm.device).then(function (device) {
           if(update_id==current_id) {
             vm.device = device;
-            vm.animation = device.animation.name;
+            if (device.animation != null) {
+              vm.animation = device.animation.name;
+            }
           }
         });
       }

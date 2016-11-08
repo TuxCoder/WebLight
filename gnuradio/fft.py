@@ -25,7 +25,7 @@ class fft(gr.top_block):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 44100
-        self.fft_size = fft_size = 1024
+        self.fft_size = fft_size = 1024*4
         self.alpha = alpha = .3
 
         ##################################################
@@ -39,6 +39,7 @@ class fft(gr.top_block):
         	avg_alpha=alpha,
         	average=True,
         )
+#        self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_float*fft_size, '172.31.107.41', 9999, 1472, True)
         self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_float*fft_size, '127.0.0.1', 9999, 1472, True)
         self.blocks_add_xx_0 = blocks.add_vff(1)
         self.blocks_add_const_vxx_0 = blocks.add_const_vff((0, ))
