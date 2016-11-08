@@ -1,3 +1,4 @@
+import logging
 from bibliopixel.animation import BaseStripAnim as OrgBaseStripAnim
 from copy import deepcopy
 from ..extensions import app
@@ -65,6 +66,7 @@ class BaseStripAnim(OrgBaseStripAnim):
         self._num_leds = len(self._device.get_leds())
         self._params = deepcopy(self.params)
         self._amt = 1
+        self.logger = logging.getLogger(__name__)
 
         self._params_updated()
 

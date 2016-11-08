@@ -1,3 +1,4 @@
+import colorsys
 import socket
 import math
 from struct import *
@@ -53,29 +54,32 @@ class AudioVisulizer(BaseStripAnim):
         sock.settimeout(1)
 
         while self._stoped == False:
-            size = 4
-            input_size = self.num_data * 2 * size
-            mtu = 1472
-            data = b''
-            while len(data) < input_size:
-                try:
-                    d, addr = sock.recvfrom(mtu)
-                except socket.timeout:
-                    break
-                data += d
-                if len(d) != mtu:
-                    break
+            try:
+                size = 4
+                input_size = self.num_data * 2 * size
+                mtu = 1472
+                data = b''
+                while len(data) < input_size:
+                    try:
+                        d, addr = sock.recvfrom(mtu)
+                    except socket.timeout:
+                        break
+                    data += d
+                    if len(d) != mtu:
+                        break
 
-            if len(data) != input_size:
-                continue
+                if len(data) != input_size:
+                    continue
 
-            floats = unpack('' + 'f' * self.num_data * 2, data)
+                floats = unpack('' + 'f' * self.num_data * 2, data)
 
-            out = [-100] * self.num_data
-            for i in range(self.num_data):
-                out[i] = (floats[i] + floats[self.num_data * 2 - 1 - i]) / 2
+                out = [-100] * self.num_data
+                for i in range(self.num_data):
+                    out[i] = (floats[i] + floats[self.num_data * 2 - 1 - i]) / 2
 
-            self.udp_data = self._prepare_data(out)
+                self.udp_data = self._prepare_data(out)
+            except Exception as e:
+                self.logger.exception("error while processing fft data",exc_info=e)
 
     def get_data(self):
         return self.udp_data
@@ -96,8 +100,8 @@ class AudioVisulizer(BaseStripAnim):
                     math.pow(10, self._log_base) - 1) * src_num + src_start
             else:
                 src_to = (i + 1) * w + src_start
-            # v = AudioVisulizer._sum_array(data, src_from, src_to) / (src_to - src_from)
-            v = AudioVisulizer._max_array(data, src_from, src_to)
+            v = AudioVisulizer._sum_array(data, src_from, src_to) / (src_to - src_from)
+            # v = AudioVisulizer._max_array(data, src_from, src_to)
             v = (v + self._offset + self._high_pass * i / num) / self._value
             out[i] = min(max(v, self._min_value), 1)
             src_from = src_to
@@ -113,7 +117,7 @@ class AudioVisulizer(BaseStripAnim):
         v = min(array)
 
         if start < 0 or end > (len(array) - 1) or end < start:
-            raise IndexError()
+            raise IndexError("invalid parameters: len({:d}), start({:f}), end({:f})".format(len(array), start, end))
 
         if start is end:
             return None
@@ -144,7 +148,7 @@ class AudioVisulizer(BaseStripAnim):
         diff = end - start
 
         if start < 0 or end > (len(array) - 1) or end < start:
-            raise IndexError()
+            raise IndexError("invalid parameters: len({:d}), start({:f}), end({:f})".format(len(array), start, end))
 
         if start is end:
             return 0
@@ -193,27 +197,33 @@ class AudioVisulizer(BaseStripAnim):
         return v1 * (1 - d) + v2 * d
 
     def step(self, amt=1):
+        try:
 
-        data = self.get_data()
-        num = len(data)
+            data = self.get_data()
+            num = len(data)
 
-        s = int(self._saturation * 255)
-        offset = int(self._pos * num)
-        for i, led in enumerate(self._device.get_leds()):
-            i += offset
-            i = i % (2 * num - 2)
-            if i >= num:
-                i = (2 * num - 2) - i
-            v = data[i]
-            v = int(v * 255 * self._brightness)
-            h = i / num / self._color_size
-            if self._color_direction:
-                h *= -1
-            h += 1 + self._color_offset
-            h = int(255 * h % 255)
-            (r, g, b) = colors.hsv2rgb((h, s, v))
+            s = self._saturation
+            offset = int(self._pos * num)
+            for i, led in enumerate(self._device.get_leds()):
+                i += offset
+                i = i % (2 * num - 2)
+                if i >= num:
+                    i = (2 * num - 2) - i
+                v = data[i]
+                v = v * self._brightness
+                h = i / num / self._color_size
+                if self._color_direction:
+                    h *= -1
+                h += 1 + self._color_offset
+                h %= 1
+                # (r, g, b) = colors.hsv2rgb((h, s, v))
+                # (r, g, b) = (h, s, v)
+                (r, g, b) = colorsys.hsv_to_rgb(h, s, v)
+                (r, g, b) = (int(r * 255), int(g * 255), int(b * 255))
 
-            self._led.setRGB(led, r, g, b)
+                self._led.setRGB(led, r, g, b)
+        except Exception as e:
+            self.logger.warn("cant caluclate step, error: {:s}".format(e.__str__()), exc_info=e)
 
     def _params_updated(self):
         super()._params_updated()
