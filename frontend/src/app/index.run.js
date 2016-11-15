@@ -1,4 +1,3 @@
-/* global csrftoken:'' */
 (function () {
   'use strict';
 

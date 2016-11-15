@@ -3,12 +3,12 @@
 <form ng-submit="vm.update()">
     <md-input-container layout="row">
         <md-select ng-change="vm.updateAnimation()" ng-model="vm.animation">
-            <md-option ng-value="animation.name" ng-repeat="animation in vm.animations">{{ animation.name }}</md-option>
+            <md-option ng-value="animation.name" ng-repeat="animation in vm.animations| orderObjectBy: 'name': false">{{ animation.name }}</md-option>
         </md-select>
       </md-input-container>
-      <md-input-container layout="row" ng-repeat="(name,param) in vm.device.animation.params">
+      <md-input-container layout="row" ng-repeat="(name,param) in vm.device.animation.params | orderByValue">
         <lable  flex="60">
-            {{ name }}
+            {{ param.name }}
             <div ng-switch="param.type">
                 <input ng-switch-when="float" ng-change="vm.update()" ng-model="param.value" type="number" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}"/>
                 <input ng-switch-when="color" ng-change="vm.update()" ng-model="param.value" type="color"/>

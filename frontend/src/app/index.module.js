@@ -2,6 +2,6 @@
   'use strict';
 
   angular
-    .module('frontend', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ngMaterial', 'toastr']);
+    .module('frontend', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ngOrderObjectBy', 'ui.router', 'ngMaterial', 'toastr']);
 
 })();
