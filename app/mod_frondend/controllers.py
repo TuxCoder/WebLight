@@ -1,8 +1,5 @@
 # Import flask dependencies
-from flask import Blueprint, request, render_template, \
-    flash, g, session, redirect, url_for
-from flask.ext.login import login_required
-from .forms import AnimationForm
+from flask import Blueprint, render_template, Response
 from ..extensions import app
 
 # Define the blueprint: 'auth', set its url prefix: app.url/auth
@@ -23,4 +20,4 @@ def scripts(file):
 
 @mod_frontend.route('csrf.js', methods=['GET'])
 def csrf():
-    return render_template("csrf.js")
+    return Response(render_template("csrf.js"), mimetype='application/json')

@@ -1,1 +1,1 @@
-csrftoken='{{ csrf_token() }}';
+{"csrftoken":"{{ csrf_token() }}"}
