@@ -8,7 +8,7 @@ class ParamType(object):
     type = None
     value = None
 
-    def __init__(self, value=None):
+    def __init__(self, value=None, **kwargs):
         self.value = value
 
     def get_value(self):
@@ -21,8 +21,8 @@ class FloatType(ParamType):
     max = None
     step = None
 
-    def __init__(self, value=None, min=None, max=None, step=None):
-        super().__init__(value)
+    def __init__(self, value=None, min=None, max=None, step=None, **kwargs):
+        super().__init__(value, **kwargs)
         self.min = min
         self.max = max
         self.step = step
@@ -42,8 +42,8 @@ class FloatType(ParamType):
 class RangeType(FloatType):
     type = 'range'
 
-    def __init__(self, value=None, min=None, max=None, step=None):
-        super().__init__(value, min, max, step)
+    def __init__(self, value=None, min=None, max=None, step=None, **kwargs):
+        super().__init__(value, min, max, step, **kwargs)
 
 
 class ColorType(ParamType):
@@ -60,13 +60,14 @@ class BaseStripAnim(OrgBaseStripAnim):
         'brightness': RangeType(value=1, min=0, max=1, step=0.01)
     }
 
-    def __init__(self, device, start=0, end=-1):
+    def __init__(self, device, start=0, end=-1, logger=None):
         super(BaseStripAnim, self).__init__(device.get_led(), start, end)
         self._device = device
         self._num_leds = len(self._device.get_leds())
         self._params = deepcopy(self.params)
         self._amt = 1
-        self.logger = logging.getLogger(__name__)
+        if logger is None:
+            self.logger = logging.getLogger(__name__)
 
         self._params_updated()
 
