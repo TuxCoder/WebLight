@@ -1,0 +1,48 @@
+Metadata-Version: 1.1
+Name: weblight
+Version: 0.1
+Summary: Web interface for light effects
+Home-page: https://www.o-g.at/
+Author: Norbert Summer
+Author-email: norbert@o-g.at
+License: UNKNOWN
+Description: 
+        
+        
+        Install
+        =======
+        
+        `$ ./install.sh`
+        
+        RUN
+        ===
+        
+        Development
+        -----------
+        
+        Load enviroment`$ souce venv/bin/souce`, start with `$ python run.py` production or with `$ python debug.py` debug mdode.
+        
+        Productiv
+        ---------
+        `uwsgi --ini uwsgi.ini`
+        
+        
+        build
+        =====
+        
+        @TODO ...
+Platform: UNKNOWN
+Classifier: Development Status :: 1 - Planning
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Installation/Setup
+Classifier: Topic :: System :: Software Distribution

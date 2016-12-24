@@ -1,0 +1,6 @@
+[console_scripts]
+weblight_cli = weblight.main:entry_point
+
+[uwsgi_script]
+weblight_uwsgi = weblight.uwsgi:entry_point
+
